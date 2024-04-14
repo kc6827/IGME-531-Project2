@@ -1,0 +1,144 @@
+<!-- The code below is based on the in class jscad demo -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Project 2</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        #render {
+            width: 90vmin;
+            height: 90vmin;
+            margin: auto;
+            outline: 1px solid black;
+
+        }
+
+        div:has(#render) {
+            width: 100%;
+            height: 100vh;
+            min-height: 100vh;
+            max-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
+
+        button {
+            font-size: 1.25em;
+            width: fit-content;
+            height: fit-content;
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+        }
+    </style>
+    </code_to_rewrite>
+</head>
+
+<body>
+    <script src="https://unpkg.com/@jscad/modeling" id="MODELING"></script>
+    <script src="https://unpkg.com/@jscad/regl-renderer"></script>
+    <!-- Borrowed from https://github.com/microsoft/maker.js/blob/ec18acb959fa1b5f3fb0c790f45ffe2f9092c1b0/docs/external/jscad/stl-serializer.js -->
+    <!-- <script src="stl-serializer.js"></script> -->
+
+    <div>
+        <div id="render"></div>
+    </div>
+
+    <script type="module" language="javascript">
+        import { render } from './render.js';
+
+        const { booleans, colors, primitives, transforms } = jscadModeling // modeling comes from the included MODELING library
+        const { translate, rotate } = transforms;
+
+        const { intersect, subtract, union } = booleans
+        const { colorize, colorNameToRgb } = colors
+        const { cube, cuboid, sphere } = primitives
+
+        const QuadX = (parameters, iterations = 0) => {
+            const size = parameters.size;
+
+            if (iterations === 0) {
+                return [
+                    cuboid({ size: [size, size / 20, size / 20] }),
+                    cuboid({ size: [size / 20, size, size / 20] }),
+                    translate([0, 0, size / 4], cuboid({ size: [size / 20, size / 20, size / 2] }))
+                ];
+            }
+
+            const quad = () => {
+                return [
+                    translate([0, 0, size / 7.5], cuboid({ size: [size, size / 20, size / 20] })),
+                    cuboid({ size: [size / 20, size, size / 20] }),
+                    translate([0, 0, size / 4], cuboid({ size: [size / 20, size / 20, size / 2] })),
+                ]
+            };
+
+            const deltaAmount = () => {
+                const deltaSize = size / 2;
+
+                return deltaSize;
+            };
+            // How big the smaller cubes should be
+            // Half the original size, made a bit bigger for overlap
+            const smallerSize = size / 1.5;
+
+            return [
+                quad(),
+                translate([deltaAmount(), 0, -(size - smallerSize) / 2], rotate([0, 0, .785], QuadX({ size: smallerSize }, iterations - 1))),
+                translate([-deltaAmount(), 0, -(size - smallerSize) / 2], rotate([0, 0, .785], QuadX({ size: smallerSize }, iterations - 1))),
+                //translate([0, deltaAmount(), 0], rotate([0, 0, .785], QuadX({ size: smallerSize }, iterations - 1))),
+                //translate([0, -deltaAmount(), 0], rotate([0, 0, .785], QuadX({ size: smallerSize }, iterations - 1)))
+            ]
+        }
+
+
+        const QuadX2 = (parameters, iterations = 0) => {
+            const size = parameters.size;
+
+            if (iterations === 0) {
+                return [
+                    cuboid({ size: [size, size / 20, size / 20] }),
+                    cuboid({ size: [size / 20, size, size / 20] }),
+                    translate([0, 0, size / 4], cuboid({ size: [size / 20, size / 20, size / 2] }))
+                ];
+            }
+
+            const quad = () => {
+                return [
+                    translate([0, 0, size / 5], cuboid({ size: [size, size / 20, size / 20] })),
+                    cuboid({ size: [size / 20, size, size / 20] }),
+                    translate([0, 0, size / 4], cuboid({ size: [size / 20, size / 20, size / 2] })),
+                ]
+            };
+
+            const deltaAmount = () => {
+                const deltaSize = size / 2;
+
+                return deltaSize;
+            };
+            // How big the smaller cubes should be
+            // Half the original size, made a bit bigger for overlap
+            const smallerSize = size / 1.5;
+
+            return [
+                quad(),
+                translate([deltaAmount(), 0, 0], rotate([0, 0, .785], QuadX2({ size: smallerSize }, iterations - 1))),
+                translate([-deltaAmount(), 0, 0], rotate([0, 0, .785], QuadX2({ size: smallerSize }, iterations - 1))),
+                //translate([0, deltaAmount(), 0], rotate([0, 0, .785], QuadX({ size: smallerSize }, iterations - 1))),
+                //translate([0, -deltaAmount(), 0], rotate([0, 0, .785], QuadX({ size: smallerSize }, iterations - 1)))
+            ]
+        }
+
+        // render(document.getElementById("render"), 
+        //        demo());
+        render(document.getElementById("render"),
+            QuadX2({ size: 100 }, 7))
+
+    </script>
+</body>
+
+</html>
